@@ -1,0 +1,11 @@
+.DS_Store
+
+cpp/bin/
+cpp/.cache/
+cpp/build/
+cpp/lib/
+cpp/compile_commands.json
+cpp/vcpkg_installed/
+
+rust/target/
+rust/Cargo.lock
