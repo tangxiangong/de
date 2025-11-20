@@ -1,0 +1,9 @@
+init:
+    uv sync
+    source .venv/bin/activate
+
+install: init
+    uv pip install -e .
+
+ode: install
+    uv run benches/ode.py

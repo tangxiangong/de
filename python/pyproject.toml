@@ -1,0 +1,9 @@
+[project]
+name = "de"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = ["numba>=0.62.1", "numpy>=2.3.5"]
+
+[tool.setuptools.packages.find]
+include = ["de*"]
