@@ -58,6 +58,7 @@ impl<F: Fn(f64) -> f64> ODE<F> {
     }
 }
 
+#[inline]
 fn rk4<F: Fn(f64) -> f64>(
     f: &F,
     lambda: f64,
@@ -66,62 +67,56 @@ fn rk4<F: Fn(f64) -> f64>(
     time_step: f64,
 ) -> (Vec<f64>, Vec<f64>) {
     let num_steps = (duration / time_step).ceil() as usize;
+    let size = num_steps + 1;
 
-    let mut t = Vec::with_capacity(num_steps + 1);
-    let mut u = Vec::with_capacity(num_steps + 1);
+    let mut t = vec![0.0; size];
+    let mut u = vec![0.0; size];
 
-    t.push(0.0);
-    u.push(initial_condition);
+    unsafe {
+        *u.get_unchecked_mut(0) = initial_condition;
+    }
 
     let mut current_t = 0.0;
     let mut current_u = initial_condition;
 
-    let derivative = |time: f64, value: f64| f(time) - lambda * value;
+    let h_2 = time_step / 2.0;
+    let h_6 = time_step / 6.0;
 
-    let mut k1;
-    let mut k2;
-    let mut k3;
-    let mut k4;
+    for i in 0..num_steps - 1 {
+        let k1 = f(current_t) - lambda * current_u;
+        let k2 = f(current_t + h_2) - lambda * (current_u + h_2 * k1);
+        let k3 = f(current_t + h_2) - lambda * (current_u + h_2 * k2);
+        let k4 = f(current_t + time_step) - lambda * (current_u + time_step * k3);
 
-    for _ in 0..num_steps - 1 {
-        k1 = derivative(current_t, current_u);
-        k2 = derivative(
-            current_t + time_step / 2.0,
-            current_u + (time_step / 2.0) * k1,
-        );
-        k3 = derivative(
-            current_t + time_step / 2.0,
-            current_u + (time_step / 2.0) * k2,
-        );
-        k4 = derivative(current_t + time_step, current_u + time_step * k3);
-
-        current_u += (time_step / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+        current_u += h_6 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
         current_t += time_step;
 
-        t.push(current_t);
-        u.push(current_u);
+        unsafe {
+            *t.get_unchecked_mut(i + 1) = current_t;
+            *u.get_unchecked_mut(i + 1) = current_u;
+        }
     }
 
     let last_step = duration - current_t;
-    k1 = derivative(current_t, current_u);
-    k2 = derivative(
-        current_t + last_step / 2.0,
-        current_u + (last_step / 2.0) * k1,
-    );
-    k3 = derivative(
-        current_t + last_step / 2.0,
-        current_u + (last_step / 2.0) * k2,
-    );
-    k4 = derivative(current_t + last_step, current_u + last_step * k3);
+    let last_h_2 = last_step / 2.0;
+    let last_h_6 = last_step / 6.0;
 
-    current_u += (last_step / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+    let k1 = f(current_t) - lambda * current_u;
+    let k2 = f(current_t + last_h_2) - lambda * (current_u + last_h_2 * k1);
+    let k3 = f(current_t + last_h_2) - lambda * (current_u + last_h_2 * k2);
+    let k4 = f(current_t + last_step) - lambda * (current_u + last_step * k3);
 
-    t.push(duration);
-    u.push(current_u);
+    current_u += last_h_6 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+
+    unsafe {
+        *t.get_unchecked_mut(num_steps) = duration;
+        *u.get_unchecked_mut(num_steps) = current_u;
+    }
 
     (t, u)
 }
 
+#[inline]
 fn euler<F: Fn(f64) -> f64>(
     f: &F,
     lambda: f64,
@@ -130,29 +125,35 @@ fn euler<F: Fn(f64) -> f64>(
     time_step: f64,
 ) -> (Vec<f64>, Vec<f64>) {
     let num_steps = (duration / time_step).ceil() as usize;
+    let size = num_steps + 1;
 
-    let mut t = Vec::with_capacity(num_steps + 1);
-    let mut u = Vec::with_capacity(num_steps + 1);
+    let mut t = vec![0.0; size];
+    let mut u = vec![0.0; size];
 
-    t.push(0.0);
-    u.push(initial_condition);
+    unsafe {
+        *u.get_unchecked_mut(0) = initial_condition;
+    }
 
     let mut current_t = 0.0;
     let mut current_u = initial_condition;
 
-    for _ in 0..num_steps - 1 {
+    for i in 0..num_steps - 1 {
         current_u += time_step * (f(current_t) - lambda * current_u);
         current_t += time_step;
 
-        t.push(current_t);
-        u.push(current_u);
+        unsafe {
+            *t.get_unchecked_mut(i + 1) = current_t;
+            *u.get_unchecked_mut(i + 1) = current_u;
+        }
     }
 
     let last_step = duration - current_t;
     current_u += last_step * (f(current_t) - lambda * current_u);
 
-    t.push(duration);
-    u.push(current_u);
+    unsafe {
+        *t.get_unchecked_mut(num_steps) = duration;
+        *u.get_unchecked_mut(num_steps) = current_u;
+    }
 
     (t, u)
 }

@@ -23,16 +23,17 @@ static Solution rk4(source_func f, double lambda, double initial_condition,
 
     double k1, k2, k3, k4;
 
+    double h_2 = time_step / 2.0;
+    double h_6 = time_step / 6.0;
+
     for (size_t i = 0; i < num_steps - 1; ++i) {
         k1 = derivative(f, lambda, current_t, current_u);
-        k2 = derivative(f, lambda, current_t + time_step / 2.0,
-                        current_u + (time_step / 2.0) * k1);
-        k3 = derivative(f, lambda, current_t + time_step / 2.0,
-                        current_u + (time_step / 2.0) * k2);
+        k2 = derivative(f, lambda, current_t + h_2, current_u + h_2 * k1);
+        k3 = derivative(f, lambda, current_t + h_2, current_u + h_2 * k2);
         k4 = derivative(f, lambda, current_t + time_step,
                         current_u + time_step * k3);
 
-        current_u += (time_step / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+        current_u += h_6 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
         current_t += time_step;
 
         t[i + 1] = current_t;
@@ -40,15 +41,16 @@ static Solution rk4(source_func f, double lambda, double initial_condition,
     }
 
     double last_step = duration - current_t;
+    double last_h_2 = last_step / 2.0;
+    double last_h_6 = last_step / 6.0;
+
     k1 = derivative(f, lambda, current_t, current_u);
-    k2 = derivative(f, lambda, current_t + last_step / 2.0,
-                    current_u + (last_step / 2.0) * k1);
-    k3 = derivative(f, lambda, current_t + last_step / 2.0,
-                    current_u + (last_step / 2.0) * k2);
+    k2 = derivative(f, lambda, current_t + last_h_2, current_u + last_h_2 * k1);
+    k3 = derivative(f, lambda, current_t + last_h_2, current_u + last_h_2 * k2);
     k4 = derivative(f, lambda, current_t + last_step,
                     current_u + last_step * k3);
 
-    current_u += (last_step / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+    current_u += last_h_6 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
 
     t[num_steps] = duration;
     u[num_steps] = current_u;

@@ -25,22 +25,26 @@ function rk4(f, lambda, initial_condition, duration, time_step)
     derivative(t, u) = f(t) - lambda * u
     current_t = 0.0
     current_u = initial_condition
+    h_2 = time_step / 2.0
+    h_6 = time_step / 6.0
     @inbounds for i in 1:num_steps-1
         k1 = derivative(current_t, current_u)
-        k2 = derivative(current_t + time_step / 2.0, current_u + (time_step / 2.0) * k1)
-        k3 = derivative(current_t + time_step / 2.0, current_u + (time_step / 2.0) * k2)
+        k2 = derivative(current_t + h_2, current_u + h_2 * k1)
+        k3 = derivative(current_t + h_2, current_u + h_2 * k2)
         k4 = derivative(current_t + time_step, current_u + time_step * k3)
-        current_u += (time_step / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
+        current_u += h_6 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
         current_t += time_step
         t[i+1] = current_t
         u[i+1] = current_u
     end
     last_step = duration - current_t
+    last_h_2 = last_step / 2.0
+    last_h_6 = last_step / 6.0
     k1 = derivative(current_t, current_u)
-    k2 = derivative(current_t + last_step / 2.0, current_u + (last_step / 2.0) * k1)
-    k3 = derivative(current_t + last_step / 2.0, current_u + (last_step / 2.0) * k2)
+    k2 = derivative(current_t + last_h_2, current_u + last_h_2 * k1)
+    k3 = derivative(current_t + last_h_2, current_u + last_h_2 * k2)
     k4 = derivative(current_t + last_step, current_u + last_step * k3)
-    current_u += (last_step / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
+    current_u += last_h_6 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
     @inbounds t[num_steps] = duration
     @inbounds u[num_steps] = current_u
     (t, u)
