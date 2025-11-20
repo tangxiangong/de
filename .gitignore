@@ -8,6 +8,12 @@ cpp/lib/
 cpp/compile_commands.json
 cpp/vcpkg_installed/
 
+c/bin/
+c/build/
+c/lib/
+c/.cache/
+c/compile_commands.json
+
 rust/target/
 rust/Cargo.lock
 
