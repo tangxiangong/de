@@ -1,0 +1,10 @@
+name = "de"
+uuid = "7764d7d9-7b71-4672-8ec8-a3c9d38a90ca"
+version = "0.1.0"
+authors = ["tangxiangong <tangxiangong@gmail.com>"]
+
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+
+[compat]
+BenchmarkTools = "1.6.3"

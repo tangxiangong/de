@@ -9,3 +9,5 @@ cpp/vcpkg_installed/
 
 rust/target/
 rust/Cargo.lock
+
+julia/Manifest.toml
