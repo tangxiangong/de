@@ -20,7 +20,7 @@ inline auto format_time(double nanoseconds) {
     if (nanoseconds < 1e3) {
         result = {nanoseconds, "ns"};
     } else if (nanoseconds < 1e6) {
-        result = {nanoseconds / 1e3, "us"};
+        result = {nanoseconds / 1e3, "μs"};
     } else if (nanoseconds < 1e9) {
         result = {nanoseconds / 1e6, "ms"};
     } else {
