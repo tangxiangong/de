@@ -7,6 +7,9 @@ function main()
     f(t) = -t
     ode = ODE(1.0, 1.0, f)
 
+    solve(ode, rk4_config)
+    solve(ode, euler_config)
+
     bench("ode-rk4", () -> solve(ode, rk4_config))
     bench("ode-euler", () -> solve(ode, euler_config))
 end

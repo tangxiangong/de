@@ -36,6 +36,7 @@ concept Solver = std::invocable<T> &&
 
 export template <Solver F>
 void bench(std::string_view &&name, F func, size_t bench_size) {
+    func();
     vector<double> result(bench_size);
     for (auto &val : result) {
         auto start_time = std::chrono::high_resolution_clock::now();

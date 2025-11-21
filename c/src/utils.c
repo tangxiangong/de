@@ -33,6 +33,8 @@ void bench(const char *name, bench_func func, void *ctx, size_t bench_size) {
     double *results = (double *)malloc(bench_size * sizeof(double));
     struct timespec start, end;
 
+    func(ctx);
+
     for (size_t i = 0; i < bench_size; ++i) {
         clock_gettime(CLOCK_MONOTONIC, &start);
         func(ctx);
