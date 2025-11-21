@@ -4,9 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+faer = "0.23"
 
 [dev-dependencies]
 criterion = "0.7"
+
+[profile.dev.package.faer]
+opt-level = 3
 
 [profile.release]
 lto = true
